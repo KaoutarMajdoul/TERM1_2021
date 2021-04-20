@@ -1,0 +1,1 @@
+le :: POS_MULTIPLE  ; petit :: POS_MULTIPLE  ; lait :: Nom: ; petit :: POS_MULTIPLE  ; 
