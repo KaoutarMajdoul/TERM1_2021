@@ -167,7 +167,7 @@ def pos_unique(tableau_relations,tableau_noeuds):
         if not found:
             tabmot.append(tableau_noeuds[elem])
 
-
+    res_pos_mot= []
     for elem in tb: #on va compter le nb de fois où on rencontre un elem de tb qui est dans tabPOS
         countPOS = 0
         for i in range(len(elem)):
@@ -184,31 +184,50 @@ def pos_unique(tableau_relations,tableau_noeuds):
             #print("ref tag :", num_Tag_Poids_Haut)
 
             for x in range(len(tableau_noeuds)):
-                if tableau_noeuds[x][1] == num_Tag_Poids_Haut :
-                    res_pos_mot = tableau_noeuds[x][2].strip("''")
-                    print(res_pos_mot) #TAG du mot
-            myResFile.write(mot +" :: "+ res_pos_mot + " ; ")
+
+                res_pos_mot.append(tableau_noeuds[x][2].strip("''"))
+            print(res_pos_mot) #TAG du mot
+            #print(res_pos_mot[1])# affiche le premier pos car 0 = le mot
+            #for mot in res_pos_mot:
+            #myResFile.write(mot + " ::")
+            myResFile.write(res_pos_mot[0] + " :: ")
+            for i in range(1,len(res_pos_mot)):
+                myResFile.write(res_pos_mot[i] + " , ")
+            myResFile.write(" ; \n")
+
 
 
         if countPOS > 1:
 
             str = "POS_MULTIPLE "
-            myResFile.write(mot +" :: "+ str + " ; ")
+            #myResFile.write(mot +" :: "+ str + " ; ")
+           # myResFile.write("\n")
+            for x in range(len(tableau_noeuds)):
+
+                res_pos_mot.append(tableau_noeuds[x][2].strip("''"))
+            print(res_pos_mot) #TAG du mot
+            #print(res_pos_mot[1])# affiche le premier pos car 0 = le mot
+            #for mot in res_pos_mot:
+            #myResFile.write(mot + " ::")
+            myResFile.write(res_pos_mot[0] + " :: " )
+            for i in range(1,len(res_pos_mot)):
+                myResFile.write(res_pos_mot[i] + " , ")
+            myResFile.write(" ; \n")
 
         print(str)
-
     myResFile.close()
 
 
-
-
-def pos_multiple():
+def save_tags_mot():
 
    # print("@@@@@@ myresult(moment).txt @@@@@@ fonction pos multiple")
     moment = time.strftime("%Y-%b-%d__%H_%M_%S", time.localtime())
     openFile = open("results/myresult"+moment+".txt", "r")
     readFile = openFile.read()
     myFile = readFile.split(";")
+    print("myfile  : ", myFile[0])
+
+
 
     firtSublist = iterutils.chunked(myFile, 1)
 
@@ -218,10 +237,10 @@ def pos_multiple():
         secondsublist = firtSublist[i][0].split("::")
 
         final.append(secondsublist)
-   # print("final :", final)
 
-   # print("myfile : ",myFile)
-    #print(myFile[0].split(" ") + myFile[1].split(" ") )
+
+
+    print("SC :",final)
 
     openFile.close()
     sequence_valide(final)
@@ -244,83 +263,126 @@ def sequence_valide(final):
         sublistSplitFinal.append(splitSeq[i].split(";"))
     #print("sublistfinal : " ,sublistSplitFinal)
 
-    print("@@@@@@@@@@ RESULTAT FINAL @@@@@@@@@@")
+    print("@@@@@@@@@@ MES TABLEAUX @@@@@@@@@@")
 
-    for x in range(len(final) - 1):
+    for i in range(len(sublistSplitFinal)):
+        print(sublistSplitFinal[i])
 
-        for i in range(len(sublistSplitFinal)):
+    # test=[]
+    # print(final)
+    # print(final[0][0])
+    # print(final[0][1].split(","))
+    # test.append(final[0][0])
+    # test.append(final[0][1].split(","))
+    # print("test : ", test)
+    # print(test[0])
+    # print(test[1])
 
-            if (final[x][1].strip(" ")) == sublistSplitFinal[i][x].strip(" "):  # on enleve les espaces pour etre sûr d'avoir que les caractère
-                print("SEQUENCE OK : ", final[x][0].strip(" ") ,final[x][1].strip(" "), " ; ", sublistSplitFinal[i][x].strip(" "))
-                break
-            if final[x][1].strip(" ") == "POS_MULTIPLE":
-                print("POSMULTIPLE : ", final[x][0].strip(" ") ,final[x][1].strip(" "))
-                #ici il faudrait appeler la fonction qui recup le mot et retourne son POS
+    wordAndTags = [] #variable qui va permette de stocker un mot et ensuite une liste de ses tag
+    for x in range(len(final)-1): #boucle pour peupler la varible comme ceci : [mot1 , [listTagMot1] , mot2, [listTagMot2]...]
+        wordAndTags.append(final[x][0])
+        wordAndTags.append(final[x][1].split(","))
+    sublistWord_tags = iterutils.chunked(wordAndTags, 2) #on découpe la liste pour avoir des sous liste contenant [mot, [listTag]]..
+    # for x in range(len(sublistWord_tags)):
+    #     for y in range(len(sublistWord_tags[x][1])):
+    #         sb = sublistWord_tags[x][1][y].strip(" ")
+    # print("sb : " ,sb)
+    print("sublistWord_tags : ", sublistWord_tags)
+    #print(mysplit[0])
 
-                propableTag(final[x][0].strip(" "),x, sublistSplitFinal) #param : mot , emplacement dans la ligne de sequence valide
+    print("seq sublistSplitFinal : ",sublistSplitFinal) #liste des sequences du fichier seq valide
 
+    #print(sublistWord_tags[0][1])
+    #print(sublistSplitFinal[2][0])
+    #print(sublistWord_tags[0][1][7].strip(" "))
+    #print(len(sublistWord_tags[0][1]))
+    print("\n @@@@@ RESULTAT FINAL @@@@@\n ")
+    idxSeq = 0
+    idxTag = 0
+    incrTag = 0
+    myListTags = []
 
-                break
+    #print("len phrase : ", len(sublistWord_tags))
+    for i in range(len(sublistSplitFinal)):
+        for z in range(len(sublistWord_tags)):
+            if len(sublistWord_tags) == (len(sublistSplitFinal[i])): #pour ne pas avoir d'erreur index out of range on ne traite que les seq de meme longeur que la phrase
 
+                #check_valide(sublistSplitFinal, i, idxSeq+z, sublistWord_tags, idxTag+z, z)
+                check_valide(sublistSplitFinal, i, idxSeq+z, sublistWord_tags, idxTag+z, z)
+                #myListTags.append(ts[1])
+                # print("z ", z)
+                # print("idxSeq", idxSeq+z)
+                # print("idxTag", idxTag+z)
+                #check_valide(sublistSplitFinal, i, idxSeq+z, sublistWord_tags, idxTag+z, z  )
 
-
-def propableTag(motposmultiple, place, seq):
-
-    chemin_absolu = os.path.dirname(os.path.abspath(__file__))
-    readPkl = pd.read_pickle(chemin_absolu+'/cache/'+motposmultiple+'.pkl')
-    #print(readPkl) #[0] = vide / [1] = tabnoeud / [2] = tabRel
-    #print(readPkl[2])
-    #num_Tag_Poids_Haut = readPkl[2][len(readPkl[2]) - 1][3]  # Valeur du tag du poids le plus haut
-    #num_Tag_2ndPoids_Haut = readPkl[2][len(readPkl[2]) - 2][3]# valeur du 2nd tag de poids le plus haut
-
-    #maintenant on doit parcourir le tableau de relation avec tous le pos positif
-    #afin de garder celui qui correspond à celui dans la sequence valide
-    #for i in (range(len(readPkl[2]))):
-    print("readpkl :", readPkl)
-    print(readPkl[1])
-    print(readPkl[2])
-    print(seq)
-    print(place)
-    estDansSeq = 0
-    for x in range(len(readPkl[1])):
-        for i in range(len(readPkl[2])):
-            #print("e :" ,readPkl[1][x][1].strip("''"))
-            #print(" r :",readPkl[2][i][3].strip("''"))
-            if readPkl[1][x][1].strip("''") == readPkl[2][i][3].strip("''"):
-
-                #print("on est bon",readPkl[1][x][2].strip("''") )
-                for z in range(len(seq)):
-                    #print("z",seq[z][place])
-                    if readPkl[1][x][2].strip("''") == seq[z][place].strip(" "):
-                        estDansSeq=1
-                        print("sequence ok",readPkl[1][x][2].strip("''"),seq[z][place] )
-
-            #     if estDansSeq == 0 and z == (len(seq)-1):
-            #         print("pas de sequence valide pour cette phrase")
-            #         break
-            #     break
-            # break
+        #print("\n")
 
 
 
+def check_valide(sublistSplitFinal, i , idxSeq,  sublistWord_tags,idxTag , z):
+    myListTags = []
+    isOK = False
+    for x in range(len(sublistWord_tags[idxTag][1])):
+
+
+        if sublistSplitFinal[i][idxSeq].strip(" ") == sublistWord_tags[idxTag][1][x].strip(" "):
+            #print("OK", "seq " , z , " : ", sublistSplitFinal[i][idxSeq].strip(" "), " tag mot : ",
+             #     sublistWord_tags[idxTag][1][x].strip(" "))
+            #print(sublistSplitFinal[i])
+            isOK = True
+
+            if isOK == True and z == (len(sublistWord_tags)-1) and idxTag == (len(sublistWord_tags)-1) and idxSeq == (len(sublistWord_tags)-1) :
+                print("Sequence valide : ")
+                #print(sublistSplitFinal[i])
+                myListTags.append(sublistSplitFinal[i])
+                print(myListTags)
+
+        #print(isOK)
+
+            #myListTags.append(sublistWord_tags[idxTag][1][x].strip(" "))
+
+    #print(" myListTags : ",myListTags)
+    #return(sublistSplitFinal[i], myListTags)
 
 
 
-
-
-
-
-
-
-
-            # obliger de break sinon il affiche tous les pos positif
-
-
-
-
-
-
-
+# def propableTag(motposmultiple, place, seq):
+#
+#     chemin_absolu = os.path.dirname(os.path.abspath(__file__))
+#     readPkl = pd.read_pickle(chemin_absolu+'/cache/'+motposmultiple+'.pkl')
+#     #print(readPkl) #[0] = vide / [1] = tabnoeud / [2] = tabRel
+#     #print(readPkl[2])
+#     #num_Tag_Poids_Haut = readPkl[2][len(readPkl[2]) - 1][3]  # Valeur du tag du poids le plus haut
+#     #num_Tag_2ndPoids_Haut = readPkl[2][len(readPkl[2]) - 2][3]# valeur du 2nd tag de poids le plus haut
+#
+#     #maintenant on doit parcourir le tableau de relation avec tous le pos positif
+#     #afin de garder celui qui correspond à celui dans la sequence valide
+#     #for i in (range(len(readPkl[2]))):
+#     print("readpkl :", readPkl)
+#     print(readPkl[1])
+#     print(readPkl[2])
+#     print(seq)
+#     print(place)
+#     estDansSeq = 0
+#     for x in range(len(readPkl[1])):
+#         for i in range(len(readPkl[2])):
+#             #print("e :" ,readPkl[1][x][1].strip("''"))
+#             #print(" r :",readPkl[2][i][3].strip("''"))
+#             if readPkl[1][x][1].strip("''") == readPkl[2][i][3].strip("''"):
+#
+#                 #print("on est bon",readPkl[1][x][2].strip("''") )
+#                 for z in range(len(seq)):
+#                     #print("z",seq[z][place])
+#                     if readPkl[1][x][2].strip("''") == seq[z][place].strip(" "):
+#                         estDansSeq=1
+#                         print("sequence ok",readPkl[1][x][2].strip("''"),seq[z][place] )
+#
+#             #     if estDansSeq == 0 and z == (len(seq)-1):
+#             #         print("pas de sequence valide pour cette phrase")
+#             #         break
+#             #     break
+#             # break
+#
 
 
 
@@ -335,7 +397,7 @@ elif (cache == 'F'):
 else:
     print("only:  T for 'true' or F for 'false'");
     exit();
-pos_multiple()
+save_tags_mot()
 #pos_multiple()
 
 
