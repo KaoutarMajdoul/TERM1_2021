@@ -25,7 +25,9 @@ import os
 import sys
 import pickle
 
-# Prend le  mot recherché et retourne la categorie gramaticale corespendante au mot, grace au  code html correspondant depuis http://www.jeuxdemots.org/rezo-dump et on prendant pour l'instant la relation r_pos telque son poid avec le noeud du mot recercher est maximale.
+# Prend le  mot recherché et retourne la categorie grammaticale correspondante au mot, 
+# grace au code html correspondant depuis http://www.jeuxdemots.org/rezo-dump 
+# et on prenant pour l'instant la relation r_pos tel que son poid avec le noeud du mot recerche est maximale.
 
 tableau_noeuds = []
 tableau_relations = []
@@ -57,8 +59,8 @@ def extraction(word: str, cache: bool):
         i += 1
     #print("id:::", id)
 
-    # on a remarqué que le maximum était en dernier (i.e les relations sont triés dans l'ordre croirssant) mais comme on n'est pas sur
-    # on a preferer le calculé.
+    # on a remarqué que le maximum était en dernier (i.e les relations sont triés dans l'ordre croissant) mais comme on n'est pas sur
+    # on a preferé le calculé.
     categorie = []
     for N in tableau_noeuds:
 
