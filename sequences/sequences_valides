@@ -1,6 +1,9 @@
+Det: ; Adj: ; Nom: ; Punct: ; Ver:Conjug ; Det: ; Nom:
 Det: ; Adj: ; Nom: ; Ver:Conjug ; Det: ; Nom:
 Det: ; Nom: ; Ver:Conjug ; Det: ; Nom:
 Pro:Pers ; Ver:Conjug ; Det:Fem+SG ; Nom:Fem+SG
 Pro:Pers ; Ver:Conjug ; Det: ; Nom:Mas+SG
 Pro:Pers:SUJ ; Ver:Conjug ; Det: ; Nom:
+Det: ; Adj: ; Nom: ; Punct:
 Det: ; Adj: ; Nom:
+Punct:
