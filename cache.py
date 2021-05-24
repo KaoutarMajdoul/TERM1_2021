@@ -25,7 +25,7 @@ import os
 import sys
 import pickle
 
-# Prend le mot recherché et retourne la categorie gramaticale corespendante au mot, grace au  code html correspondant depuis http://www.jeuxdemots.org/rezo-dump et on prendant pour l'instant la relation r_pos telque son poid avec le noeud du mot recercher est maximale.
+# Prend le  mot recherché et retourne la categorie gramaticale corespendante au mot, grace au  code html correspondant depuis http://www.jeuxdemots.org/rezo-dump et on prendant pour l'instant la relation r_pos telque son poid avec le noeud du mot recercher est maximale.
 
 tableau_noeuds = []
 tableau_relations = []
@@ -37,14 +37,15 @@ def extraction(word: str, cache: bool):
     encoding = html.encoding if 'charset' in html.headers.get('content-type', '').lower() else None
     soup = BeautifulSoup(html.content, 'html.parser', from_encoding='iso-8859-1')
     texte_brut = soup.find_all('code')
-    #print("txt ", texte_brut)
+    print("txt ", texte_brut)
 
 
     noeuds = re.findall('[e];[0-9]*;.*', str(texte_brut))
     #print(" noeuds " ,noeuds)
 
     relations = re.findall('[r];[0-9]*;.*', str(texte_brut))
-    # print("rel " , relations)
+    print("la liste relations " , relations)
+    print("la liste noeuds " , noeuds)
     # print("word " ,word)
     if ((not noeuds) and (not relations)) :
         print("le mot " + word + " n'existe pas dans jeux de mots")
@@ -68,11 +69,20 @@ def extraction(word: str, cache: bool):
     # on a remarqué que le maximum était en dernier (i.e les relations sont triés dans l'ordre croirssant) mais comme on n'est pas sur
     # on a preferer le calculé.
     categorie = []
+    noeudsPositifs=[]
+    idNoeudsPositifs=[]
+    for X in id:
+        idNoeudsPositifs.append(X[3]);
+
+    idNoeudsPositifs.append(tableau_relations[0][2]);
+    print("*******************",tableau_relations[0][2]);    
     for N in tableau_noeuds:
-
-        if (int(N[1]) in id):
+        if (N[1] in idNoeudsPositifs):
             categorie.append(N[2]);
+            noeudsPositifs.append(N);
 
+    print("categorie*******",categorie);
+    print("les noeuds positifs sont ",noeudsPositifs)
     print("word", word)
     if cache:
         chemin_absolu = os.path.dirname(os.path.abspath(__file__))
@@ -83,9 +93,9 @@ def extraction(word: str, cache: bool):
                 print('La création du dossier cache a échoué')
 
         fichier_cache = open(chemin_absolu + '/cache/' + word + '.pkl', 'wb')
-        pickle.dump([categorie,tableau_noeuds, id], fichier_cache)
+        pickle.dump([categorie,noeudsPositifs, id], fichier_cache)
         fichier_cache.close()
-        pos_unique(id,tableau_noeuds)
+        pos_unique(id,noeudsPositifs)
         #print("cat : ",categorie)
 
     tableau_noeuds.clear()
@@ -411,6 +421,7 @@ analyse(phrase, True);
 
 save_tags_mot()
 #pos_multiple()
+
 
 
 
