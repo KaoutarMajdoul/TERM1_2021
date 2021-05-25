@@ -37,19 +37,21 @@ def extraction(word: str, cache: bool):
     encoding = html.encoding if 'charset' in html.headers.get('content-type', '').lower() else None
     soup = BeautifulSoup(html.content, 'html.parser', from_encoding='iso-8859-1')
     texte_brut = soup.find_all('code')
-    print("txt ", texte_brut)
+    #print("txt ", texte_brut)
 
 
     noeuds = re.findall('[e];[0-9]*;.*', str(texte_brut))
+    #print(" noeuds " ,noeuds)
 
     relations = re.findall('[r];[0-9]*;.*', str(texte_brut))
-    print("la liste relations " , relations)
-    print("la liste noeuds " , noeuds)
+   # print("la liste relations " , relations)
+  #  print("la liste noeuds " , noeuds)
     # print("word " ,word)
     if ((not noeuds) and (not relations)) :
         print("le mot " + word + " n'existe pas dans jeux de mots")
         return None
 
+    # print(texte_brut)
 
     for noeud in noeuds:
         tableau_noeuds.append(noeud.split(';'))
@@ -62,7 +64,7 @@ def extraction(word: str, cache: bool):
         if (int(tableau_relations[i][5]) >= 0):
             id.append(tableau_relations[i])
         i += 1
-    print("id:::", id)
+    #print("id:::", id)
 
     # on a remarqué que le maximum était en dernier (i.e les relations sont triés dans l'ordre croirssant) mais comme on n'est pas sur
     # on a preferer le calculé.
@@ -73,15 +75,15 @@ def extraction(word: str, cache: bool):
         idNoeudsPositifs.append(X[3]);
 
     idNoeudsPositifs.append(tableau_relations[0][2]);
-    print("*******************",tableau_relations[0][2]);    
+   # print("*******************",tableau_relations[0][2]);
     for N in tableau_noeuds:
         if (N[1] in idNoeudsPositifs):
             categorie.append(N[2]);
             noeudsPositifs.append(N);
 
-    print("categorie*******",categorie);
-    print("les noeuds positifs sont ",noeudsPositifs)
-    print("word", word)
+    #print("categorie*******",categorie);
+   # print("les noeuds positifs sont ",noeudsPositifs)
+   # print("word", word)
     if cache:
         chemin_absolu = os.path.dirname(os.path.abspath(__file__))
         if not os.path.isdir(chemin_absolu + '/cache'):
@@ -117,6 +119,9 @@ def extraction_cache(word: str, cache: bool):
         fichier.close()
         pos_unique(categorie[2], categorie[1])
 
+       # mot = categorie[1][0][2].strip("''")
+        #print(mot)  # affiche le mot dans le tableau categorie
+        #return categorie
     return "##############"
 
 
@@ -135,6 +140,18 @@ def analyse(phrase: str, cache: bool):
 
 
 
+#
+#
+# def analysePOSunique(phrase: str):
+#     words = phrase.split(" ");
+#     for word in words:
+#         if (word[len(word) - 1] in ['.', ',', '!', ':', '?', ';']):
+#
+#             print(word[:-1] + "  :: " + extraction(str(word[:-1])))
+#             print(word[len(word) - 1] + "  :: " + extraction(str(word[len(word) - 1])))
+#         else:
+#             print(word + "  :: " + extraction(str(word)));
+#         # print(extraction(str(word)))
 
 
 def pos_unique(tableau_relations,tableau_noeuds):
@@ -167,7 +184,7 @@ def pos_unique(tableau_relations,tableau_noeuds):
     myResFile = open("results/myresult"+moment+".txt", 'a')
     mot = tableau_noeuds[0][2].strip("''")  # recup le mot concerné
     for elem in range(len(tableau_noeuds)):  #cette boucle permet de garder seulement le tab de tab_noeud contenant le mot
-    
+        # print(tableau_noeuds[elem])
         found = re.search(r":", tableau_noeuds[elem][2])  # PERMET DE NE GARDER QUE LA LIGNE DE TABNOEUDS AVEC LE MOT
         if not found:
             tabmot.append(tableau_noeuds[elem])
@@ -184,7 +201,7 @@ def pos_unique(tableau_relations,tableau_noeuds):
             str = "POS_UNIQUE  "
             for x in range(len(tableau_noeuds)):
                 res_pos_mot.append(tableau_noeuds[x][2].strip("''"))
-            print(res_pos_mot) #TAG du mot
+           # print(res_pos_mot) #TAG du mot
 
 
 
@@ -199,44 +216,48 @@ def pos_unique(tableau_relations,tableau_noeuds):
         if countPOS > 1:
 
             str = "POS_MULTIPLE "
-         
+            #myResFile.write(mot +" :: "+ str + " ; ")
+           # myResFile.write("\n")
             for x in range(len(tableau_noeuds)):
 
                 res_pos_mot.append(tableau_noeuds[x][2].strip("''"))
-            print(res_pos_mot) #TAG du mot
-           
+           # print(res_pos_mot) #TAG du mot
+            #print(res_pos_mot[1])# affiche le premier pos car 0 = le mot
+            #for mot in res_pos_mot:
+            #myResFile.write(mot + " ::")
             myResFile.write(res_pos_mot[0] + " :: " )
             for i in range(1,len(res_pos_mot)):
                 myResFile.write(res_pos_mot[i] + " , ")
             myResFile.write(" ; \n")
 
-        print(str)
+       # print(str)
     myResFile.close()
 
 
 def save_tags_mot():
 
+   # print("@@@@@@ myresult(moment).txt @@@@@@ fonction pos multiple")
     moment = time.strftime("%Y-%b-%d__%H_%M_%S", time.localtime())
     openFile = open("results/myresult"+moment+".txt", "r")
     readFile = openFile.read()
     myFile = readFile.split(";")
-    print("myfile  : ", myFile[0])
+   # print("myfile  : ", myFile[0])
 
 
     final = []
     firtSublist = iterutils.chunked(myFile, 1)
-    print("frist", firtSublist)
-    print(firtSublist[0][0])
+    #print("frist", firtSublist)
+   # print(firtSublist[0][0])
 
     for i in range(len(firtSublist)):
         if "Punct:" in firtSublist[i][0]:
-            print("il y a une ponct")
-            print("here", firtSublist[i][0])
+           # print("il y a une ponct")
+          #  print("here", firtSublist[i][0])
             #essayer de concatener , et Punct
             ts = firtSublist[i][0].split("::")
-            print("ts", ts[1].split(","))
+          #  print("ts", ts[1].split(","))
             fint = ts[1].split(",")
-            print(fint[(len(fint) - 2)].strip(" "))
+          #  print(fint[(len(fint) - 2)].strip(" "))
             final.append(fint[(len(fint) - 2)].strip(" "))
 
         else:
@@ -245,12 +266,13 @@ def save_tags_mot():
 
 
 
-    print("SC :",final)
+    #print("SC :",final)
 
     openFile.close()
     sequence_valide(final)
 
 def sequence_valide(final):
+
     openSeq = open("sequences/sequences_valides", "r")
     readSeq = openSeq.read()
 
@@ -261,11 +283,11 @@ def sequence_valide(final):
     for i in range(len(splitSeq)):
         sublistSplitFinal.append(splitSeq[i].split(";"))
 
+    #print("@@@@@@@@@@ MES TABLEAUX @@@@@@@@@@")
 
-    print("@@@@@@@@@@ MES TABLEAUX @@@@@@@@@@")
+    #for i in range(len(sublistSplitFinal)):
+     #   print(sublistSplitFinal[i])
 
-    for i in range(len(sublistSplitFinal)):
-        print(sublistSplitFinal[i])
 
 
     wordAndTags = [] #variable qui va permette de stocker un mot et ensuite une liste de ses tag
@@ -273,13 +295,7 @@ def sequence_valide(final):
         wordAndTags.append(final[x][0])
         wordAndTags.append(final[x][1].split(","))
     sublistWord_tags = iterutils.chunked(wordAndTags, 2) #on découpe la liste pour avoir des sous liste contenant [mot, [listTag]]..
-  
-    print("sublistWord_tags : ", sublistWord_tags)
-   
 
-    print("seq sublistSplitFinal : ",sublistSplitFinal) #liste des sequences du fichier seq valide
-
-  
     print("\n @@@@@ RESULTAT FINAL @@@@@\n ")
     idxSeq = 0
     idxTag = 0
@@ -291,8 +307,8 @@ def sequence_valide(final):
         for z in range(len(sublistWord_tags)):
             if len(sublistWord_tags) == (len(sublistSplitFinal[i])): #pour ne pas avoir d'erreur index out of range on ne traite que les seq de meme longeur que la phrase
 
+                #check_valide(sublistSplitFinal, i, idxSeq+z, sublistWord_tags, idxTag+z, z)
                 check_valide(sublistSplitFinal, i, idxSeq+z, sublistWord_tags, idxTag+z, z)
-               
 
 
 
@@ -303,7 +319,7 @@ def check_valide(sublistSplitFinal, i , idxSeq,  sublistWord_tags,idxTag , z):
 
 
         if sublistSplitFinal[i][idxSeq].strip(" ") == sublistWord_tags[idxTag][1][x].strip(" "):
-         
+
             isOK = True
 
             if isOK == True and z == (len(sublistWord_tags)-1) and idxTag == (len(sublistWord_tags)-1) and idxSeq == (len(sublistWord_tags)-1) :
@@ -312,7 +328,11 @@ def check_valide(sublistSplitFinal, i , idxSeq,  sublistWord_tags,idxTag , z):
                 myListTags.append(sublistSplitFinal[i])
                 print(myListTags)
 
-     
+            else :
+                isOK= False
+        else:
+            isOK = False
+
 
 
 
@@ -324,8 +344,3 @@ analyse(phrase, True);
 
 
 save_tags_mot()
-
-
-
-
-
