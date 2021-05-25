@@ -1,1 +1,0 @@
-boit :: Ver:Conjug ; du :: POS_MULTIPLE  ; lait :: Nom: ; 

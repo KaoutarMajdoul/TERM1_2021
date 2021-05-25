@@ -1,1 +1,0 @@
-je :: Pro:Pers ; bois :: POS_MULTIPLE  ; du :: POS_MULTIPLE  ; lait :: Nom: ; 

@@ -1,1 +1,0 @@
-petit :: POS_MULTIPLE  ; chat :: Nom: ; boit :: Ver:Conjug ; du :: POS_MULTIPLE  ; lait :: Nom: ; 

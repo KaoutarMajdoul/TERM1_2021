@@ -1,1 +1,0 @@
-boivent :: Ver:IPre+PL+P3:SPre+PL+P3 ; du :: POS_MULTIPLE  ; lait :: Nom: ; 

@@ -1,1 +1,0 @@
-les :: POS_MULTIPLE  ; petits :: POS_MULTIPLE  ; chats :: POS_MULTIPLE  ; 
