@@ -17,7 +17,6 @@ from pandas.tests.io.test_pickle import compare
 tableau_noeuds = []
 tableau_relations = []
 
-
 import re
 from bs4 import BeautifulSoup
 import requests
