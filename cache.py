@@ -1,3 +1,5 @@
+import itertools
+import operator
 import re
 import time
 from unittest import case
@@ -6,16 +8,11 @@ from operator import itemgetter
 
 import iterutils as iterutils
 from boltons import iterutils
-import numpy
-from bs4 import BeautifulSoup
-import requests
-import pandas as pd
-import numpy as np
-import pytest
-from pandas.tests.io.test_pickle import compare
-
+import glob
+import os
 tableau_noeuds = []
 tableau_relations = []
+from termcolor import colored
 
 import re
 from bs4 import BeautifulSoup
@@ -117,10 +114,6 @@ def extraction_cache(word: str, cache: bool):
         categorie = pickle.load(fichier)
         fichier.close()
         pos_unique(categorie[2], categorie[1])
-
-       # mot = categorie[1][0][2].strip("''")
-        #print(mot)  # affiche le mot dans le tableau categorie
-        #return categorie
     return "##############"
 
 
@@ -137,20 +130,6 @@ def analyse(phrase: str, cache: bool):
             print(word + "  :: ")
             print(extraction_cache(str(word), cache));
 
-
-
-#
-#
-# def analysePOSunique(phrase: str):
-#     words = phrase.split(" ");
-#     for word in words:
-#         if (word[len(word) - 1] in ['.', ',', '!', ':', '?', ';']):
-#
-#             print(word[:-1] + "  :: " + extraction(str(word[:-1])))
-#             print(word[len(word) - 1] + "  :: " + extraction(str(word[len(word) - 1])))
-#         else:
-#             print(word + "  :: " + extraction(str(word)));
-#         # print(extraction(str(word)))
 
 
 def pos_unique(tableau_relations,tableau_noeuds):
@@ -202,12 +181,12 @@ def pos_unique(tableau_relations,tableau_noeuds):
                 res_pos_mot.append(tableau_noeuds[x][2].strip("''"))
            # print(res_pos_mot) #TAG du mot
 
-
-
             myResFile.write(res_pos_mot[0] + " :: ")
             for i in range(1,len(res_pos_mot)):
                 myResFile.write(res_pos_mot[i] + " , ")
             myResFile.write(" ; \n")
+
+            print(str)
 
 
 
@@ -215,19 +194,16 @@ def pos_unique(tableau_relations,tableau_noeuds):
         if countPOS > 1:
 
             str = "POS_MULTIPLE "
-            #myResFile.write(mot +" :: "+ str + " ; ")
-           # myResFile.write("\n")
+
             for x in range(len(tableau_noeuds)):
 
                 res_pos_mot.append(tableau_noeuds[x][2].strip("''"))
-           # print(res_pos_mot) #TAG du mot
-            #print(res_pos_mot[1])# affiche le premier pos car 0 = le mot
-            #for mot in res_pos_mot:
-            #myResFile.write(mot + " ::")
+
             myResFile.write(res_pos_mot[0] + " :: " )
             for i in range(1,len(res_pos_mot)):
                 myResFile.write(res_pos_mot[i] + " , ")
             myResFile.write(" ; \n")
+            print(str)
 
        # print(str)
     myResFile.close()
@@ -314,23 +290,117 @@ def sequence_valide(final):
 def check_valide(sublistSplitFinal, i , idxSeq,  sublistWord_tags,idxTag , z):
     myListTags = []
     isOK = False
+    somme=0
+    newlist = []
+    mynewl=[]
+
     for x in range(len(sublistWord_tags[idxTag][1])):
 
 
-        if sublistSplitFinal[i][idxSeq].strip(" ") == sublistWord_tags[idxTag][1][x].strip(" "):
 
+        if sublistSplitFinal[i][idxSeq].strip(" ") == sublistWord_tags[idxTag][1][x].strip(" "):
+            somme+=1
             isOK = True
 
-            if isOK == True and z == (len(sublistWord_tags)-1) and idxTag == (len(sublistWord_tags)-1) and idxSeq == (len(sublistWord_tags)-1) :
-                print("Sequence valide : ")
-                #print(sublistSplitFinal[i])
-                myListTags.append(sublistSplitFinal[i])
-                print(myListTags)
 
-            else :
-                isOK= False
+
+            chemin_absolu = os.path.dirname(os.path.abspath(__file__))
+            list_of_files = glob.glob(chemin_absolu+'/results/*')  # * means all if need specific format then *.csv
+            latest_file = max(list_of_files, key=os.path.getctime)
+            openf = open(latest_file, 'r+' )
+            mystridx =(str(idxSeq))
+            istr = (str(i))
+            openf.write(mystridx + ":" + istr + ";" )
+            last_line = openf.readlines()
+            #print(latest_file)
+            #print(openf)
+            subLastline =last_line[len(last_line) - 1].split(";")
+
+            print("@@@@@@@@")
+            print("à checker : ", sublistSplitFinal[i])  # La séquence qu'on check
+            print("num seq :",
+                  i)  # num de la ligne de la seq qu'on test, on va l'enregistrer dans le fichier pour trier
+
+            print("je compare : ", sublistSplitFinal[i][idxSeq].strip(" "), ";",
+                  sublistWord_tags[idxTag][1][x].strip(" "))
+            #print("idxseq", idxSeq)
+            #print("idxtag", idxTag)
+            newlist.append(idxTag)
+
+            #print("lastline : ", subLastline)
+            for n in range(len(subLastline)-1):
+
+                mynewl.append(subLastline[n].split(":"))
+                #print(mynewl[z][1])
+
+
+            #print(subLastline[0].split(":"))
+
+            #print(mynewl)
+
+            #groups = itertools.groupby(mynewl, key=lambda element: element[1])
+            #print(groups)
+            mynewl.sort(key=itemgetter(1))  # on va grouper les tag par num de sequence de comparaison car on a [idxTag : idxSeq]
+            groups = groupby(mynewl, itemgetter(1))
+            listgroup = [[item for item in data] for (key, data) in
+                  groups]  # on garde un sous groupe par sequence
+            #print("groupe by : ", listgroup)
+            #print("groupby0", listgroup[0])
+            #print("groupby0", listgroup[0][0][1])
+
+
+
+
+
+
+
+           # print("lenlistgrp", len(listgroup))
+            for u in range(len(listgroup)):
+                print("numsequence" , listgroup[u][0][1])
+                #print("mylist1", listgroup[u])
+                #print("mylist2", listgroup[u][0])
+                #print("mylist2", listgroup[u][len(listgroup[u])-1])
+
+                #print(idxSeq , " = " , len(listgroup[u] ))
+                #print(idxSeq-1, " = ", listgroup[u][len(listgroup[u])-1][0])
+
+
+                if (idxSeq == (len(listgroup[u]))) and isOK == True and z == (len(sublistWord_tags) - 1) and idxTag == (
+                        len(sublistWord_tags) - 1) and idxSeq == (len(sublistWord_tags) - 1):
+                    print(colored(" ++++++ SEQUENCE VALIDE : ++++++", 'green'))
+                    # print(sublistSplitFinal[i])
+                    myListTags.append(sublistSplitFinal[i])
+                    print(colored(myListTags, 'green'))
+                    print(colored("+++++++ ++++++++ ++++++++ +++++++", 'green'))
+                    break
+
+
+                elif z == (len(sublistWord_tags) - 1):
+                    isOK = False
+                    #print("la séquence n'est pas valide pour cette phrase")
+
+                    break
+               # print("lenphrase", len(phrase.split(" ")) - 1)
+            #operator.itemgetter((mynewl(1)))
+
+            test1 =listgroup[u][len(listgroup[u]) - 1][0].strip("''")
+            test2=(len(phrase.split(" ")) - 1)
+            #print("test1", listgroup[u][len(listgroup[u]) - 1][0].strip("''"))
+            #print("test2", (len(phrase.split(" ")) - 1))
+
+            #openf.write(str(test1))
+
+            openf.close()
+
+
+
         else:
             isOK = False
+
+            #compter le nb de fois où on groupe by le
+
+
+
 
 
 
@@ -343,3 +413,4 @@ analyse(phrase, True);
 
 
 save_tags_mot()
+#pos_multiple()
